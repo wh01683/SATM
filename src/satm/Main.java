@@ -12,9 +12,7 @@ import java.util.Random;
  * Terms:
  *
  * Transaction: a complete traversal from S1 to S12 resulting in valid termination
- * Failure: A sequence of S1-S1-S1 is considered a failure on behalf of the card. The transaction will end after two
- *          unsuccessful reads. A path S1-S1 is considered valid because the last S1 is deemed successful (leads to other
- *          states in the SATM) but S1-S1-S1 is invalid because the first two S1 calls are unsuccessful.
+ * Incomplete: An incomplete transaction.
  * MTBF: Mean Time Between Failures
  *
  * The purpose of this program is to simulate a SATM (Simple Automatic Teller Machine) by using methods to mimic
@@ -28,9 +26,6 @@ import java.util.Random;
  * SATM and a hashTable to keep track of number of Strings produced. At the end of execution, each unique transaction
  * String produced is printed to the console along with the number produced. The total number of unique transaction
  * Strings produced is also given.
- *
- * Iterating 1.0E8 times, the SATM program functions with only .038477% failure rate, resulting in
- * (1.0E8/38477) = 2598 MTBF, or approx. 2598 transactions between failures.
  *
  * */
 
@@ -48,7 +43,7 @@ class Main {
     public static void main(String[] args){
 
         Main start = new Main();
-        start.startTest(50000000);
+        start.startTest(500000);
 
 
     }
@@ -80,7 +75,7 @@ class Main {
         double result = r.nextDouble();
 
         if ((result < .02) && (infiniteLoopStopper == 1)) {
-            stateTransitions = "FAILURE";
+            stateTransitions = "INCOMPLETE";
             CloseSession();
         }
 
@@ -126,7 +121,8 @@ class Main {
         double result = r.nextDouble();
 
         if(result<.04){
-            CardSwipe(true);
+            stateTransitions = "INCOMPLETE";
+            CloseSession();
         }
         else{
             TransactionChoice();
@@ -188,7 +184,7 @@ class Main {
     }
 
     private void CloseSession(){
-        if(!(stateTransitions.equalsIgnoreCase("FAILURE"))){
+        if(!(stateTransitions.equalsIgnoreCase("INCOMPLETE"))){
             stateTransitions += "S12";
         }
 
